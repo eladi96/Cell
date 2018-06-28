@@ -128,7 +128,6 @@ def extractionCells(img_or, c):
 if __name__ == "__main__":
 
     start_time = time.monotonic()
-
     c = 0
     path = os.getcwd() + "/" + "inputImages/"
     for infile in glob.glob(os.path.join(path, '*.JPG')):
