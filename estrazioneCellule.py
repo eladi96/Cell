@@ -130,7 +130,7 @@ if __name__ == "__main__":
     start_time = time.monotonic()
 
     c = 0
-    path = os.getcwd() + "/" + "output/"
+    path = os.getcwd() + "/" + "inputImages/"
     for infile in glob.glob(os.path.join(path, '*.JPG')):
         print(infile)
         img_or = Image.open(infile)
