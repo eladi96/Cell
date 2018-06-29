@@ -22,7 +22,6 @@ from datetime import timedelta
 
 
 def detections_cells(image):
-
     # perform pyramid mean shift filtering
     # to aid the thresholding step
     shifted = cv2.pyrMeanShiftFiltering(image, 21, 51)
@@ -32,7 +31,6 @@ def detections_cells(image):
     gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
     thresh = cv2.threshold(gray, 0, 255,
                            cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
-    cv2.imshow("Thresh", thresh)
 
     # compute the exact Euclidean distance from every binary
     # pixel to the nearest zero pixel, then find peaks in this
@@ -57,7 +55,6 @@ def detections_cells(image):
 
 
 def extraction_cells(image, c):
-
     # if the directory doesn't exist then create a new one
     in_path = os.getcwd() + "/"
     directory = in_path + "/" + "cellule/"
@@ -82,7 +79,7 @@ def extraction_cells(image, c):
         cell = image[minr:maxr + 10, minc:maxc + 10]
 
         if i != 0:
-            io.imsave("cellule/agglomerati/image" + str(c) + "_cell" + str(i) + ".png", cell)
+            io.imsave("cellule/image" + str(c) + "_cell" + str(i) + ".png", cell)
 
         i = i + 1
 
