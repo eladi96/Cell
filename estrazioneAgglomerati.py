@@ -10,11 +10,15 @@ from skimage import filters
 from skimage import io
 from skimage import morphology
 from skimage.measure import label, regionprops
+import cv2
 
 
 def detection_cells(img_or):
+
+    shifted = cv2.pyrMeanShiftFiltering(img_or, 21, 51)
+
     # selection of RGB's red channel
-    channel_r = img_or[..., 0]
+    channel_r = shifted[..., 0]
 
     # thresholding otsu to separate cells from background
     thresh = filters.threshold_otsu(channel_r)  # thresh = 131
@@ -23,7 +27,7 @@ def detection_cells(img_or):
 
     # closing
     selem = morphology.disk(5)
-    img_thresh = morphology.erosion(img_thresh, selem)
+    img_thresh = morphology.opening(img_thresh, selem)
     io.imshow(img_thresh)
 
     # label image regions
