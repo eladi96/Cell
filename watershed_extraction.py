@@ -59,7 +59,7 @@ def extraction_cells(image, c):
     in_path = os.getcwd() + "/"
     directory = in_path + "/" + "cellule/"
     if not os.path.exists(directory):
-        os.makedirs("cellule/agglomerati/")
+        os.makedirs("cellule/")
 
     filtered_labels = detections_cells(image)
 
