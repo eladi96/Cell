@@ -80,13 +80,21 @@ def extraction_cells(image, c):
 
         # draw circle around cells
         minr, minc, maxr, maxc = region.bbox
-        # x, y = region.centroid
-        # diam = region.equivalent_diameter
-        # circle = mpatches.Circle((y, x), radius=diam,
-        #                          fill=False, edgecolor='red', linewidth=2)
-        # ax.add_patch(circle)
+        x, y = region.centroid
+        diam = region.equivalent_diameter
+        circle = mpatches.Circle((y, x), radius=diam,
+                                 fill=False, edgecolor='red', linewidth=2)
+        ax.add_patch(circle)
+
+        x_side = maxc - minc
+        y_side = maxr - minr
+        if x_side > y_side:
+            maxr = x_side + minr
+        else:
+            maxc = y_side + minc
 
         cell = image[minr:maxr + 10, minc:maxc + 10]
+        cell = cv2.resize(cell, (50, 50))
 
         if i != 0:
             io.imsave("cellule/image" + str(c) + "_cell" + str(i) + ".png", cell)
