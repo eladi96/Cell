@@ -11,13 +11,11 @@ import matplotlib.patches as mpatches
 import matplotlib.pyplot as plt
 import numpy as np
 import cv2
-from PIL import Image, ImageEnhance
 
 from skimage import morphology
 from skimage import io
 from skimage.measure import regionprops
 from skimage.feature import peak_local_max
-from skimage.morphology import watershed
 from scipy import ndimage
 from datetime import timedelta
 
@@ -34,7 +32,7 @@ def detections_cells(image):
     thresh = cv2.threshold(gray, 0, 255,
                            cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
 
-    # closing
+    # morphological transformation
     selem = morphology.disk(5)
     thresh = morphology.dilation(thresh, selem)
 
@@ -48,7 +46,7 @@ def detections_cells(image):
     # perform a connected component analysis on the local peaks,
     # using 8-connectivity, then appy the Watershed algorithm
     markers = ndimage.label(local_max, structure=np.ones((3, 3)))[0]
-    labels = watershed(-d, markers, mask=thresh)
+    labels = morphology.watershed(-d, markers, mask=thresh)
 
     # Remove lables too small
     filtered_labels = np.copy(labels)
@@ -73,19 +71,21 @@ def extraction_cells(image, c):
 
     filtered_labels = detections_cells(image)
 
-    fig, ax = plt.subplots(figsize=(10, 6))
+    # fig, ax = plt.subplots(figsize=(10, 6))
 
     i = 0
     for region in regionprops(filtered_labels):
 
         # draw circle around cells
         minr, minc, maxr, maxc = region.bbox
-        x, y = region.centroid
-        diam = region.equivalent_diameter
-        circle = mpatches.Circle((y, x), radius=diam,
-                                 fill=False, edgecolor='red', linewidth=2)
-        ax.add_patch(circle)
+        # x, y = region.centroid
+        # diam = region.equivalent_diameter
+        # circle = mpatches.Circle((y, x), radius=diam,
+        #                         fill=False, edgecolor='red', linewidth=2)
+        # ax.add_patch(circle)
 
+        # Transform the region to crop from rectangular
+        # to square
         x_side = maxc - minc
         y_side = maxr - minr
         if x_side > y_side:
@@ -93,7 +93,11 @@ def extraction_cells(image, c):
         else:
             maxc = y_side + minc
 
-        cell = image[minr:maxr + 10, minc:maxc + 10]
+        if (minc > 20) & (minr > 20):
+            minc = minc - 20
+            minr = minr - 20
+
+        cell = image[minr:maxr + 20, minc:maxc + 20]
         cell = cv2.resize(cell, (50, 50))
 
         if i != 0:
@@ -117,7 +121,7 @@ if __name__ == "__main__":
 
         img_or = cv2.imread(infile)
 
-        # riporto il colore a rgb
+        # transform the color scheme to RGB
         img_or = cv2.cvtColor(img_or, cv2.COLOR_BGR2RGB)
 
         try:
