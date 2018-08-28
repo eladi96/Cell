@@ -34,9 +34,9 @@ def detection_cells(img_or):
     # delete labels too big
     filtered_image = np.copy(label_image)
     component_sizes = np.bincount(label_image.ravel())
-    # too_big = component_sizes > 100000
-    # too_big_mask = too_big[label_image]
-    # filtered_image[too_big_mask] = 1
+    too_big = component_sizes > 100000
+    too_big_mask = too_big[label_image]
+    filtered_image[too_big_mask] = 1
 
     # delete labels too small
     too_small = component_sizes < 4000
@@ -86,7 +86,7 @@ if __name__ == "__main__":
     start_time = time.monotonic()
     c = 0
     path = os.getcwd() + "/" + "inputImages/"
-    for infile in glob.glob(os.path.join(path, '*.JPG')):
+    for infile in glob.glob(os.path.join(path, '*.png')):
         print(infile)
         img_or = Image.open(infile)
         img_en = ImageEnhance.Color(img_or)

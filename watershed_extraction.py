@@ -7,10 +7,10 @@
 import glob
 import os
 import time
-import matplotlib.patches as mpatches
-import matplotlib.pyplot as plt
 import numpy as np
 import cv2
+import matplotlib.patches as mpatches
+import matplotlib.pyplot as plt
 
 from skimage import morphology
 from skimage import io
@@ -62,7 +62,7 @@ def detections_cells(image):
     return filtered_labels
 
 
-def extraction_cells(image, c):
+def extraction_cells(image, k):
     # if the directory doesn't exist then create a new one
     in_path = os.getcwd() + "/"
     directory = in_path + "/" + "cellule/"
@@ -71,18 +71,18 @@ def extraction_cells(image, c):
 
     filtered_labels = detections_cells(image)
 
-    # fig, ax = plt.subplots(figsize=(10, 6))
+    fig, ax = plt.subplots(figsize=(10, 6))
 
     i = 0
     for region in regionprops(filtered_labels):
 
         # draw circle around cells
         minr, minc, maxr, maxc = region.bbox
-        # x, y = region.centroid
-        # diam = region.equivalent_diameter
-        # circle = mpatches.Circle((y, x), radius=diam,
-        #                         fill=False, edgecolor='red', linewidth=2)
-        # ax.add_patch(circle)
+        x, y = region.centroid
+        diam = region.equivalent_diameter
+        circle = mpatches.Circle((y, x), radius=diam,
+                                 fill=False, edgecolor='red', linewidth=2)
+        ax.add_patch(circle)
 
         # Transform the region to crop from rectangular
         # to square
@@ -98,16 +98,15 @@ def extraction_cells(image, c):
             minr = minr - 20
 
         cell = image[minr:maxr + 20, minc:maxc + 20]
-        cell = cv2.resize(cell, (50, 50))
 
         if i != 0:
-            io.imsave("cellule/image" + str(c) + "_cell" + str(i) + ".png", cell)
+            io.imsave("cellule/Img_" + str(k) + "_cell" + str(i) + ".png", cell)
 
         i = i + 1
 
-    # ax.set_axis_off()
-    # io.imshow(image)
-    # plt.show()
+    ax.set_axis_off()
+    io.imshow(image)
+    plt.show()
 
 
 # Main execution
@@ -130,5 +129,5 @@ if __name__ == "__main__":
             continue
         c = c + 1
 
-end_time = time.monotonic()
-print(timedelta(seconds=end_time - start_time))
+    end_time = time.monotonic()
+    print(timedelta(seconds=end_time - start_time))
