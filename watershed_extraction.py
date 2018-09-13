@@ -25,28 +25,32 @@ def detections_cells(image):
     # perform pyramid mean shift filtering
     # to aid the thresholding step
     shifted = cv2.pyrMeanShiftFiltering(image, 21, 51)
+    #io.imshow(shifted)
 
     # convert the mean shift image to grayscale, then apply
     # Otsu's thresholding
-    gray = cv2.cvtColor(shifted, cv2.COLOR_BGR2GRAY)
+    gray = cv2.cvtColor(shifted, cv2.COLOR_RGB2GRAY)
+    #io.imshow(gray)
     thresh = cv2.threshold(gray, 0, 255,
                            cv2.THRESH_BINARY_INV | cv2.THRESH_OTSU)[1]
+    #io.imshow(thresh)
 
     # morphological transformation
     selem = morphology.disk(5)
     thresh = morphology.dilation(thresh, selem)
+    #io.imshow(thresh)
 
-    # compute the exact Euclidean distance from every binary
-    # pixel to the nearest zero pixel, then find peaks in this
-    # distance map
+    # compute the exact Euclidean distance from every binary pixel to the nearest zero pixel,
+    # then find peaks in this distance map
     d = ndimage.distance_transform_edt(thresh)
-    local_max = peak_local_max(d, indices=False, min_distance=20,
-                               labels=thresh)
+    local_max = peak_local_max(d, indices=False, min_distance=20, labels=thresh)
 
     # perform a connected component analysis on the local peaks,
     # using 8-connectivity, then appy the Watershed algorithm
     markers = ndimage.label(local_max, structure=np.ones((3, 3)))[0]
     labels = morphology.watershed(-d, markers, mask=thresh)
+
+    #io.imshow(labels)
 
     # Remove lables too small
     filtered_labels = np.copy(labels)
@@ -84,8 +88,7 @@ def extraction_cells(image, k):
                                  fill=False, edgecolor='red', linewidth=2)
         ax.add_patch(circle)
 
-        # Transform the region to crop from rectangular
-        # to square
+        # Transform the region to crop from rectangular to square
         x_side = maxc - minc
         y_side = maxr - minr
         if x_side > y_side:
@@ -104,14 +107,13 @@ def extraction_cells(image, k):
 
         i = i + 1
 
-    ax.set_axis_off()
-    io.imshow(image)
-    plt.show()
+    #ax.set_axis_off()
+    #io.imshow(image)
+    #plt.show()
 
 
 # Main execution
 if __name__ == "__main__":
-
     start_time = time.monotonic()
     c = 0
     path = os.getcwd() + "/" + "inputImages/"
